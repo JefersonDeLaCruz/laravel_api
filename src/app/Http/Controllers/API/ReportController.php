@@ -31,6 +31,18 @@ class ReportController extends Controller
             ->latest()
             ->paginate($request->integer('per_page', 15));
 
+        $user = $request->user() ?? $this->authenticateFromToken($request);
+        if ($user) {
+            $ids = $reports->getCollection()->pluck('id');
+            $votes = \App\Models\ReportVote::where('user_id', $user->id)
+                ->whereIn('report_id', $ids)
+                ->pluck('type', 'report_id');
+            $reports->getCollection()->transform(function ($report) use ($votes) {
+                $report->user_vote = $votes->get($report->id);
+                return $report;
+            });
+        }
+
         return response()->json([
             'success' => true,
             'reports' => $reports,

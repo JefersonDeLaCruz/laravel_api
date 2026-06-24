@@ -9,34 +9,19 @@ use Illuminate\Database\Seeder;
 
 class ReportSeeder extends Seeder
 {
-    /**
-     * Genera reportes de prueba ubicados en San Miguel, El Salvador
-     * (centro aprox. 13.4833, -88.1833), usando ReportFactory.
-     */
     public function run(): void
     {
-        $users = User::factory(5)->create();
+        $users      = User::all();
         $categories = Category::all();
 
-        if ($categories->isEmpty()) {
-            $categories = Category::factory(4)->create();
-        }
+        // 150 reportes en San Miguel y zona FMO
+        Report::factory(110)->recycle($users)->recycle($categories)->create();
+        Report::factory(25)->verified()->recycle($users)->recycle($categories)->create();
+        Report::factory(15)->resolved()->recycle($users)->recycle($categories)->create();
 
-        Report::factory(15)
-            ->recycle($users)
-            ->recycle($categories)
-            ->create();
-
-        Report::factory(5)
-            ->verified()
-            ->recycle($users)
-            ->recycle($categories)
-            ->create();
-
-        Report::factory(3)
-            ->resolved()
-            ->recycle($users)
-            ->recycle($categories)
-            ->create();
+        // 50 reportes en campus UES FMO
+        Report::factory(35)->fmo()->recycle($users)->recycle($categories)->create();
+        Report::factory(10)->fmo()->verified()->recycle($users)->recycle($categories)->create();
+        Report::factory(5)->fmo()->resolved()->recycle($users)->recycle($categories)->create();
     }
 }
